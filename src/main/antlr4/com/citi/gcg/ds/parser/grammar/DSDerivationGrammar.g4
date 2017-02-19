@@ -49,6 +49,7 @@ expressionList
     |   expression '.' Identifier
     |   expression '.' 'this'
     |   expression '[' expression ']'
+    |   expression '[' (literal (',' literal)* (',')? )? ']'
     |   expression '(' expressionList? ')'
     |   '(' primitiveType ')' expression
     |   expression ('++' | '--')
