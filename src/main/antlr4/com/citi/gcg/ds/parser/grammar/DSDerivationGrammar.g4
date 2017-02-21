@@ -13,7 +13,7 @@ if_then_else: IF expression THEN expression (ELSE expression* statement*)?;
 
 //if_then_else: IF expressionList THEN expressionList (ELSE expressionList* statement*)?;   
  
-
+substring_expression : expression '[' expression (',' expression)* ']';
     
  else_part:
     ELSE expression
@@ -31,12 +31,7 @@ if_then_else: IF expression THEN expression (ELSE expression* statement*)?;
    ;   
    
  funcname : Identifier;  
- 
- expr
- 	: primaryExpr
- 	| func
- 		
- 	;   
+  
     
    
     
@@ -48,9 +43,11 @@ localVariableDeclaration
     :    primitiveType? variableDeclarators
     ;    
 
-expressionList
+arguments
     :   expression (',' expression)*
     ;
+expressionList
+    :   expression (',' expression)*  ;  
 substring:  subStringVarName  '[' (literal (',' literal)* (',')? )? ']'; 
 
 subStringVarName : inputLinkName '.' columnName;
@@ -58,23 +55,11 @@ subStringVarName : inputLinkName '.' columnName;
  expression
     :   expression '.' Identifier
     |   expression '.' 'this'
-    |   funcname '(' expressionList? ')'
+    |   funcname '(' arguments? ')'
     |   expression '[' expression ']'
     |   expression '(' expressionList? ')'
     |   '(' primitiveType ')' expression
-    |   expression ('++' | '--')
-    |   ('+'|'-'|'++'|'--') expression
-    |   ('~'|'!') expression
-    |   expression ('*'|'/'|'%') expression
-    |   expression ('+'|'-'|':') expression
-    |   expression ('<' '<' | '>' '>' '>' | '>' '>') expression
-    |   expression ('<=' | '>=' | '>' | '<') expression
-    |   expression ('==' | '!=') expression
-    |   expression '&' expression
-    |   expression '^' expression
-    |   expression '|' expression
-    |   expression '&&' expression
-    |   expression '||' expression
+    |   expression binary_operator expression
     |   expression '?' expression ':' expression
     |   literal
     |   primaryExpr
@@ -94,6 +79,22 @@ subStringVarName : inputLinkName '.' columnName;
         )
         expression
     ;   
+    
+ binary_operator :    arithmetic_operator |
+   concatenation_operator |
+   matches_operator |
+   relational_operator |
+   logical_operator;
+matches_operator : 'matches';   
+arithmetic_operator : '+' | '-' | '*' | '/' | '^';
+concatenation_operator : ':';
+relational_operator :    '   =' |'EQ' | 
+      '<>' | '#' | 'NE' |
+      '>' | 'GT' |
+      '>=' | '=>' | 'GE' |
+      '<' | 'LT' |
+      '<=' | '=<' | 'LE' ;
+logical_operator : 'AND' | 'OR'    ;   
 primary
     :   '(' expression ')'
     |   'this'
