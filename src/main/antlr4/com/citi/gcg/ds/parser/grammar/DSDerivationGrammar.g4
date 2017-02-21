@@ -9,7 +9,10 @@ statement
  
 if_then: IF expression THEN expression;   
 
-if_then_else: if_then (ELSE expression* statement*)?;   
+if_then_else: IF expression THEN expression (ELSE expression* statement*)?;  
+
+//if_then_else: IF expressionList THEN expressionList (ELSE expressionList* statement*)?;   
+ 
 
     
  else_part:
@@ -27,7 +30,14 @@ if_then_else: if_then (ELSE expression* statement*)?;
    : funcname LPAREN expression RPAREN
    ;   
    
- funcname : Identifier;   
+ funcname : Identifier;  
+ 
+ expr
+ 	: primaryExpr
+ 	| func
+ 		
+ 	;   
+    
    
     
 localVariableDeclarationStatement
@@ -38,18 +48,18 @@ localVariableDeclaration
     :    primitiveType? variableDeclarators
     ;    
 
-
- 
 expressionList
     :   expression (',' expression)*
     ;
-    
+substring:  subStringVarName  '[' (literal (',' literal)* (',')? )? ']'; 
+
+subStringVarName : inputLinkName '.' columnName;
+
  expression
-    :   primary
-    |   expression '.' Identifier
+    :   expression '.' Identifier
     |   expression '.' 'this'
+    |   funcname '(' expressionList? ')'
     |   expression '[' expression ']'
-    |   expression '[' (literal (',' literal)* (',')? )? ']'
     |   expression '(' expressionList? ')'
     |   '(' primitiveType ')' expression
     |   expression ('++' | '--')
@@ -66,6 +76,8 @@ expressionList
     |   expression '&&' expression
     |   expression '||' expression
     |   expression '?' expression ':' expression
+    |   literal
+    |   primaryExpr
     |   <assoc=right> expression
         (   '='
         |   '+='
@@ -89,17 +101,31 @@ primary
     |   literal
     |   Identifier
     |   'void' '.' 'class'
-    ;    
+    ;  
+    
+assignExpr: inputLinkName '.' columnName;
+
+primaryExpr: inputLinkName '.' columnName;
+
+inputLinkName: Identifier;
+
+columnName: Identifier;
+      
 literal
-    :   IntegerLiteral
-    |   FloatingPointLiteral
-    |   CharacterLiteral
-    |   StringLiteral
-    |   BooleanLiteral
-    |   'null'
+    :  numberLiteral
+    |   characterLiteral
+    |   stringLiteral
+    |   booleanLiteral
+    |   nullLiteral
     ;   
+characterLiteral : CharacterLiteral;   
+numberLiteral :      IntegerLiteral
+    |   FloatingPointLiteral;  
 
+stringLiteral:StringLiteral;
 
+booleanLiteral: BooleanLiteral;
+nullLiteral : 'null';
 
 
 

@@ -2,6 +2,7 @@ package com.citi.gcg.rh.beans;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class RHExpression {
 	
@@ -174,7 +175,35 @@ public class RHExpression {
 	private boolean leaf = false;
 	private String typeDet = "";
 	private String funcArgType = "FUN";
+	private String funcArgDataType;
 	
+	private String _inputLinkName;
+	private Map<String,String> _otherAttrMap;
+	
+	/**
+	 * @return the funcArgDataType
+	 */
+	public String getFuncArgDataType() {
+		return funcArgDataType;
+	}
+	/**
+	 * @param funcArgDataType the funcArgDataType to set
+	 */
+	public void setFuncArgDataType(String funcArgDataType) {
+		this.funcArgDataType = funcArgDataType;
+	}
+	public String get_inputLinkName() {
+		return _inputLinkName;
+	}
+	public void set_inputLinkName(String _inputLinkName) {
+		this._inputLinkName = _inputLinkName;
+	}
+	public Map<String,String> get_otherAttrMap() {
+		return _otherAttrMap;
+	}
+	public void set_otherAttrMap(Map<String,String> _otherAttrMap) {
+		this._otherAttrMap = _otherAttrMap;
+	}
 	private RHEntityAttributeObject rec;
 	
 	
