@@ -50,6 +50,25 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		generateIdPrefix();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<Statement>");
+		//System.out.println("child count -->"+ctx.getChild(0).getChildCount());
+		
+		if(ctx.getChild(0).getChildCount() == 1){
+			String id = generateTreeId();
+			idStack.push(id);
+			
+			RHExpression expr = new RHExpression();
+			expr.setFuncArgType("FUN");
+			expr.setType("Function");
+			
+			expr.setTypeDet("ASSIGN");
+			expr.setText("ASSIGN");
+			
+			//System.out.println("idStack --> "+idStack.size());
+			expr.setParentId(idStack.get(idStack.size()-2));
+			expr.setId(idStack.peek());
+			visitorRHExprList.add(expr);
+		}
+		
 		visitChilds(ctx, sb);
 		sb.append("</Statement>");
 		visitorStack.put("statement", sb.toString());
@@ -134,7 +153,22 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		String parentId = idStack.peek();
 		String id = generateTreeId();
 		idStack.push(id);
-		System.out.println(String.format("expr  parentId - %s, id - %s", parentId,id));
+		//System.out.println(String.format("expr  parentId - %s, id - %s", parentId,id));
+		if(childCount>=5){
+			if(StringUtils.equalsIgnoreCase(ctx.getChild(1).getText(), "[") && StringUtils.equalsIgnoreCase(ctx.getChild(5).getText(), "]")){
+				RHExpression expr = new RHExpression();
+				expr.setFuncArgType("Fun");
+				expr.setType("Function");
+				expr.setTypeDet("SUBSTRING");
+				expr.setText("SUBSTRING");
+				
+				//System.out.println("idStack --> "+idStack.size());
+				expr.setParentId(idStack.get(idStack.size()-2));
+				expr.setId(idStack.peek());
+				visitorRHExprList.add(expr);
+			}
+		}
+		
 		for (int i = 0; i < childCount; i++) {
 			//System.out.println(" - expression -->["+i+" - "+ctx.getChild(i).getClass().getName()+"]"+ctx.getChild(i).getText());
 
@@ -146,7 +180,7 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 				// visitorStack.put("expr_"+(exprCounter++),
 				// visit(ctx.getChild(i)).asString());
 			} else {
-				//System.out.println(ctx.getChild(i).getText());
+				//System.out.println(i+"~~"+ctx.getChild(i).getText());
 			}
 
 			// visitorStack.put("expr_"+1, visit(ctx.getChild(i)).asString());
@@ -181,9 +215,8 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		expr.setType("Function");
 		expr.setTypeDet("SUBSTRING");
 		expr.setText("SUBSTRING");
-		/*String id = generateTreeId();
-		idStack.push(id);*/
-		System.out.println("idStack --> "+idStack.size());
+		
+		//System.out.println("idStack --> "+idStack.size());
 		expr.setParentId(idStack.get(idStack.size()-2));
 		expr.setId(idStack.peek());
 		visitorRHExprList.add(expr);

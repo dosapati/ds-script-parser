@@ -45,9 +45,9 @@ public class App3 {
 
 			String s1 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' else UpCase(DateToString(Tfm_Standardize.CHRG_OFF_DT,'%dd%mmm%yyyy'))";
 			String s2 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' ";
-			String s = "Tfm_Standardize.REPORTING_PERIOD [1,6]";
+			String s3 = "Tfm_Standardize.REPORTING_PERIOD [1,6]";
 			String s4 = "Tfm_Standardize.ACCOUNT_NUMBER";
-			String s6 = "'0.0'";
+			String s = "'0.0'";
 			ANTLRInputStream input = new ANTLRInputStream(s);
 			DSDerivationGrammarLexer lexer = new DSDerivationGrammarLexer(input);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -96,7 +96,7 @@ public class App3 {
 			
 			finalRHExprList.add(rootExpr);
 			
-			if(visitorRHExprList.size() == 1){
+			/*if(visitorRHExprList.size() == 1){
 				RHExpression assignExpr = new RHExpression();
 				assignExpr.setFuncArgType("FUN");
 				assignExpr.setType("Function");
@@ -104,7 +104,7 @@ public class App3 {
 				assignExpr.setTypeDet("ASSIGN");
 				assignExpr.setText("ASSIGN");
 				finalRHExprList.add(assignExpr);
-			}
+			}*/
 			
 			finalRHExprList.addAll(visitorRHExprList);
 			

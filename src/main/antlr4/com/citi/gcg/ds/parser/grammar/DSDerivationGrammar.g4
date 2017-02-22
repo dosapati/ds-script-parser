@@ -2,12 +2,7 @@ grammar DSDerivationGrammar;
     
     
 statement
-	: expression EOF
-    | substring EOF
-    | literal
-    | primaryExpr
-    | Identifier
-    | EOF
+	: expression
     ;
     
      
@@ -18,7 +13,6 @@ if_then_else: IF expression THEN expression (ELSE expression*)?;
 
 //if_then_else: IF expressionList THEN expressionList (ELSE expressionList* statement*)?;   
  
-substring : expression '[' expression (',' expression)* ']';
     
  else_part:
     ELSE expression
@@ -59,8 +53,11 @@ subStringVarName : inputLinkName '.' columnName;
 
 function_call : funcname  '(' arguments ')';
 
- expression
+substring : expression '[' expression (',' expression) ']';
+
+expression
     :   if_then_else
+    |   expression '[' expression (',' expression) ']'
     |   funcname  '(' arguments ')'
     |   expression '(' expressionList? ')'
     |   '(' primitiveType ')' expression
@@ -84,7 +81,7 @@ function_call : funcname  '(' arguments ')';
         |   '%='
         )
         expression
-    ;   
+    ;        
     
  binary_operator :    arithmetic_operator |
    concatenation_operator |
