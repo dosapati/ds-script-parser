@@ -81,7 +81,7 @@ public class DSDerivationGrammarUtil {
 		
 		LinkedList<RHExpression> visitorRHExprList = visitor.visitorRHExprList;
 		
-		FilesUtil.createFile("output/if_else_if.json", gson.toJson(visitorRHExprList));
+		//FilesUtil.createFile("output/if_else_if.json", gson.toJson(visitorRHExprList));
 
 		return visitorRHExprList;
 
