@@ -20,7 +20,7 @@ public class FormDataParser {
 	final static Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 	public static void main(String[] args) throws Exception{
 		
-		parseDecodedStringFromFile("./data/assign_s_n.txt");
+		parseDecodedStringFromFile("./data/if_else_markup.txt");
 		
 	}
 

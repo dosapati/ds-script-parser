@@ -4,6 +4,7 @@ grammar DSDerivationGrammar;
 statement
     : if_then_else  EOF?
     | expression EOF
+    | substring EOF
     | EOF
     ;
  
@@ -462,9 +463,10 @@ SingleCharacter
 // §3.10.5 String Literals
 
 StringLiteral
-    :  SQSTR | DQSTR
+    :  SQSTR | DQSTR  
     ;
-
+IUQ_STRING      :  (~['"'])*? NL ;
+fragment NL     : '\n' ;
 SQSTR : '\'' (~['"] | DQSTR)* '\'';
 DQSTR : '"'  (~['"] | SQSTR)* '"';
 

@@ -1,5 +1,6 @@
 package com.citi.gcg.rh.beans;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -163,7 +164,12 @@ public class RHExpression {
 	public void setChildren(List<RHExpression> children) {
 		this.children = children;
 	}
-	private String text =  "Start";
+	private String text =  "";
+	private String typeDet = "";
+	private String funcArgType = "FUN";
+	private String funcArgDataType;
+	private String type = "";
+	
 	private boolean root =  false;
 	private boolean isFirst =  true;
 	private boolean isLast =  true;
@@ -171,14 +177,11 @@ public class RHExpression {
 	private int index = 0;
 	private List<RHExpression> children = new LinkedList<>();
 	private boolean visible = true;
-	private String type = "";
 	private boolean leaf = false;
-	private String typeDet = "";
-	private String funcArgType = "FUN";
-	private String funcArgDataType;
+	
 	
 	private String _inputLinkName;
-	private Map<String,String> _otherAttrMap;
+	private Map<String,String> _otherAttrMap = new LinkedHashMap<>();
 	
 	/**
 	 * @return the funcArgDataType

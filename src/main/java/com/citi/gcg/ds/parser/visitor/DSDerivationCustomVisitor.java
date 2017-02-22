@@ -4,14 +4,17 @@
 package com.citi.gcg.ds.parser.visitor;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.apache.commons.lang3.StringUtils;
 
 import com.citi.gcg.ds.parser.grammar.DSDerivationGrammarBaseVisitor;
 import com.citi.gcg.ds.parser.grammar.DSDerivationGrammarParser;
+import com.citi.gcg.rh.beans.RHExpression;
 import com.citi.gcg.rh.beans.Value;
 
 /**
@@ -22,6 +25,10 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 
 	public LinkedHashMap<String, String> visitorStack = new LinkedHashMap<>();
 
+	public LinkedList<RHExpression> visitorRHExprList = new LinkedList<>();
+
+	
+
 	@Override
 	public Value visitIf_then_else(@NotNull DSDerivationGrammarParser.If_then_elseContext ctx) {
 		// ctx.expression()
@@ -29,15 +36,47 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		sb.append("<if_then_else>");
 		int childCount = ctx.getChildCount();
 		for (int i = 0; i < childCount; i++) {
-			if (i == 1 || i == 3 || i == 5) {
+			if (!(ctx.getChild(i) instanceof TerminalNodeImpl)) {
 				System.out.println(ctx.getChild(i).getClass().getName());
+
 				if (i == 1) {
+					/**
+					 * "text": "IF", "typeDet": "IF", "funcArgType": "FUN", "leaf": false,
+					 * "type": "Condition", "qtip": "IF(LOGICAL_TEST, VALUE_IF_TRUE,
+					 * VALUE_IF_FALSE)",
+					 */
+					RHExpression expr = new RHExpression();
+					expr.setFuncArgType("FUN");
+					expr.setType("Condition");
+
+					expr.setTypeDet("IF");
+					expr.setText("IF");
+					expr.setLeaf(false);
+
+					visitorRHExprList.add(expr);
 					sb.append("<if>").append(visit(ctx.getChild(i))).append("</if>");
 				} else if (i == 3) {
+
+					/*
+					 * RHExpression expr = new RHExpression(); expr.setFuncArgType("FUN");
+					 * expr.setType("Condition");
+					 * 
+					 * expr.setTypeDet("IF"); expr.setText("IF"); expr.setLeaf(false);
+					 */
+
 					sb.append("<then>").append(visit(ctx.getChild(i))).append("</then>");
 				} else if (i == 5) {
+
+					/*
+					 * RHExpression expr = new RHExpression(); expr.setFuncArgType("FUN");
+					 * expr.setType("Condition");
+					 * 
+					 * expr.setTypeDet("IF"); expr.setText("IF"); expr.setLeaf(false);
+					 */
+
 					sb.append("<else>").append(visit(ctx.getChild(i))).append("</else>");
 				}
+				System.out.println("%%%%%%% \n\n" + ctx.getChild(i).getChild(0).getClass().getName() + "\n\n %%%%%%%");
 				// visitorStack.put("if_expr_"+i,
 				// visit(ctx.getChild(i)).asString());
 			} else {
@@ -108,9 +147,12 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		// System.out.println("varName -->"+m11.get("inputLinkName")+" ...
 		// "+m11.get("columnName"));
 
-		System.out.println("visitor ~~ " + ctx.getRuleIndex() + "~~ depth ->" + ctx.depth() + ",  ->" + ctx.getText()
-				+ " ->" + ctx.getChild(0).getText() + " child 3 -->" + ctx.getChild(2).getText() + " child 5 -->"
-				+ ctx.getChild(4).getText());
+		/*
+		 * System.out.println("visitor ~~ " + ctx.getRuleIndex() + "~~ depth ->" +
+		 * ctx.depth() + ",  ->" + ctx.getText() + " ->" + ctx.getChild(0).getText()
+		 * + " child 3 -->" + ctx.getChild(2).getText() + " child 5 -->" +
+		 * ctx.getChild(4).getText());
+		 */
 		return new Value(ctx.getText());
 	}
 
@@ -139,7 +181,7 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		LinkedHashMap<String, String> output = new LinkedHashMap<>();
 		output.put("inputLinkName", ctx.getText());
 		visitorStack.put("inputLinkName", ctx.getText());
-		Value v = new Value("<inputLinkName>" + ctx.getText() + "</inputLinkName>");
+		Value v = new Value(ctx.getText());
 		return v;
 	}
 
@@ -157,7 +199,7 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		System.out.println("visitColumnName " + " ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());
 		visitorStack.put("columnName", ctx.getText());
 
-		Value v = new Value("<columnName>" + ctx.getText() + "</columnName>");
+		Value v = new Value(ctx.getText() );
 		return v;
 	}
 
@@ -174,14 +216,46 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 
 	@Override
 	public Value visitStringLiteral(@NotNull DSDerivationGrammarParser.StringLiteralContext ctx) {
+		/**
+		 * "text": "MMDDYYYY",
+				"typeDet": "String_Value",
+				"funcArgType": "VALUE",
+				"funcArgDataType": "S",
+		 */
+		RHExpression expr = new RHExpression();
+		expr.setFuncArgType("S");
+		expr.setType("VALUE");
+		expr.setTypeDet("String_Value");
+		expr.setText(cleanUpString(ctx.getText()));
+		visitorRHExprList.add(expr);
+		
 		System.out.println("visitLiteral" + " ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());
 		Value v = new Value("<stringLiteral>" + ctx.getText() + "</stringLiteral>");
 		return v;
+	}
+	
+	public String cleanUpString(String s){
+		if(StringUtils.startsWith(s, "'")){
+			s = StringUtils.removeFirst(s, "'");
+			s = StringUtils.removeEnd(s, "'");
+		}else if(StringUtils.startsWith(s, "\"")){
+			s = StringUtils.removeFirst(s, "\"");
+			s = StringUtils.removeEnd(s, "\"");
+		}
+		
+		return s;
+		
 	}
 
 	@Override
 	public Value visitNumberLiteral(@NotNull DSDerivationGrammarParser.NumberLiteralContext ctx) {
 		System.out.println("visitLiteral" + " ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());
+		RHExpression expr = new RHExpression();
+		expr.setFuncArgType("N");
+		expr.setType("VALUE");
+		expr.setTypeDet("Numeric_Value");
+		expr.setText(ctx.getText());
+		visitorRHExprList.add(expr);
 		Value v = new Value("<numberLiteral>" + ctx.getText() + "</numberLiteral>");
 		return v;
 	}
@@ -192,10 +266,29 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		Value v = new Value(ctx.getText());
 		return v;
 	}
+	static Map<String,String> funcMapping = new LinkedHashMap<>();
+	static{
+		funcMapping.put("IsNull", "IS_NULL");
+		funcMapping.put("IsNotNull", "IS_NOT_NULL");
+		funcMapping.put("UpCase", "UPPER");
+		funcMapping.put("DateToString", "DATE_TO_STR");
+	}
 
 	@Override
 	public Value visitFuncname(@NotNull DSDerivationGrammarParser.FuncnameContext ctx) {
 		System.out.println("visitFuncname ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());
+		/**
+		 * "text": "IS_NOT_NULL", "typeDet": "IS_NOT_NULL", "funcArgType": "FUN",
+		 * "leaf": false, "type": "Common",
+		 */
+		RHExpression expr = new RHExpression();
+		expr.setFuncArgType("FUN");
+		expr.setType("Common");
+
+		expr.setTypeDet(funcMapping.get(ctx.getText()));
+		expr.setText(funcMapping.get(ctx.getText()));
+		expr.setLeaf(false);
+		visitorRHExprList.add(expr);
 		Value v = new Value("<funcName>" + ctx.getText() + "</funcName>");
 		return v;
 	}
@@ -206,7 +299,7 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		for (int i = 0; i < childCount; i++) {
 			if (!(ctx.getChild(i) instanceof TerminalNodeImpl)) {
 				sb.append(visit(ctx.getChild(i)));
-				System.out.println(("visitPrimaryExpr - " + childCount) + " ~~~~ " + visit(ctx.getChild(i)));
+				//System.out.println(("visitPrimaryExpr - " + childCount) + " ~~~~ " + visit(ctx.getChild(i)));
 			} else {
 
 			}
@@ -227,15 +320,43 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		System.out.println("visitPrimaryExpr ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());
 		StringBuilder sb = new StringBuilder();
 		sb.append("<primaryExpr>");
+		
+		/*RHExpression expr = new RHExpression();
+		expr.setFuncArgType("FUN");
+		expr.setType("Common");
+
+		expr.setTypeDet(funcMapping.get(ctx.getText()));
+		expr.setText(funcMapping.get(ctx.getText()));
+		expr.setLeaf(false);
+		visitorRHExprList.add(expr);*/
+		
+		/*"text": "CRD_ACCT_NBR",
+		"typeDet": "Attribute",
+		"funcArgType": "ATTRIBUTE",
+		"leaf": true,
+		"type": "Parameter",*/
 		int childCount = ctx.getChildCount();
+		RHExpression expr = new RHExpression();
+		expr.setFuncArgType("ATTRIBUTE");
+		expr.setType("Parameter");
+		expr.setTypeDet("Attribute");
+		
 		for (int i = 0; i < childCount; i++) {
 			if (!(ctx.getChild(i) instanceof TerminalNodeImpl)) {
-				sb.append(visit(ctx.getChild(i)));
-				System.out.println(("visitPrimaryExpr - " + childCount) + " ~~~~ " + visit(ctx.getChild(i)));
+				Value v = visit(ctx.getChild(i));
+				if(i == 0){
+					expr.get_otherAttrMap().put("_inputLinkName", v.asString());
+				}else if (i ==2){
+					expr.setText(v.asString());
+				}
+				sb.append(v.asString());
+				//System.out.println(("visitPrimaryExpr ["+i+"]  - " + childCount) + " ~~~~ " + visit(ctx.getChild(i)));
 			} else {
 
 			}
 		}
+		visitorRHExprList.add(expr);
+
 		sb.append("</primaryExpr>");
 		Value v = new Value(sb);
 		return v;
@@ -261,11 +382,11 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		for (int i = 0; i < childCount; i++) {
 			if (!(ctx.getChild(i) instanceof TerminalNodeImpl)) {
 				sb.append(visit(ctx.getChild(i)));
-				System.out.println(("visitPrimaryExpr - " + childCount) + " ~~~~ " + visit(ctx.getChild(i)));
+				//System.out.println(("visitPrimaryExpr - " + childCount) + " ~~~~ " + visit(ctx.getChild(i)));
 			} else {
 
 			}
-			System.out.println(("visitArguments -" + childCount) + "~~~~" + visit(ctx.getChild(i)));
+			//System.out.println(("visitArguments -" + childCount) + "~~~~" + visit(ctx.getChild(i)));
 		}
 		sb.append("</arguments>");
 		Value v = new Value(sb.toString());
