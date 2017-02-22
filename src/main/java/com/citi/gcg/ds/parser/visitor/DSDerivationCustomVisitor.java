@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.citi.gcg.ds.parser.grammar.DSDerivationGrammarBaseVisitor;
 import com.citi.gcg.ds.parser.grammar.DSDerivationGrammarParser;
+import com.citi.gcg.ds.parser.grammar.DSDerivationGrammarParser.LiteralContext;
+import com.citi.gcg.ds.parser.grammar.DSDerivationGrammarParser.PrimaryExprContext;
 import com.citi.gcg.rh.beans.RHExpression;
 import com.citi.gcg.rh.beans.Value;
 
@@ -31,9 +33,7 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 
 	static Stack<String> idStack = new Stack<>();
 	
-	static{
-		idStack.push("root");
-	}
+	
 	
 	String idPrefix = "ext-";
 			
@@ -45,14 +45,18 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 	
 	@Override
 	public Value visitStatement(@NotNull DSDerivationGrammarParser.StatementContext ctx) {
+		
+		buildRootExpression();
+		
 		//generate id prefix ... first ..
 		
 		generateIdPrefix();
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("<Statement>");
-		//System.out.println("child count -->"+ctx.getChild(0).getChildCount());
+		//System.out.println("child count -->"+ctx.getChild(0).getChild(0).getClass());
 		
-		if(ctx.getChild(0).getChildCount() == 1){
+		if(ctx.getChild(0).getChild(0) instanceof LiteralContext || ctx.getChild(0).getChild(0) instanceof PrimaryExprContext){
 			String id = generateTreeId();
 			idStack.push(id);
 			
@@ -73,6 +77,21 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		sb.append("</Statement>");
 		visitorStack.put("statement", sb.toString());
 		return new Value(sb.toString());
+	}
+
+	private void buildRootExpression() {
+		RHExpression rootExpr = new RHExpression();
+		rootExpr.setFuncArgType("");
+		rootExpr.setType("");
+		
+		rootExpr.setTypeDet("");
+		rootExpr.setText("Root");
+		rootExpr.setRoot(true);
+		rootExpr.setFirst(true);
+		rootExpr.setLast(true);
+		rootExpr.setId("root");
+		visitorRHExprList.add(rootExpr);
+		idStack.push("root");
 	}
  
 	@Override

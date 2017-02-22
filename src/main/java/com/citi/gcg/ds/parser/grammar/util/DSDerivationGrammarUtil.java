@@ -68,7 +68,7 @@ public class DSDerivationGrammarUtil {
 
 		ParseTree tree = parser.statement();
 
-		log.info("tree " + tree.toStringTree(parser));
+		log.info("AST tree -->>>  " + tree.toStringTree(parser));
 
 		// ParseTreeWalker walker=new ParseTreeWalker();
 
@@ -77,61 +77,13 @@ public class DSDerivationGrammarUtil {
 		DSDerivationCustomVisitor visitor = new DSDerivationCustomVisitor();
 		visitor.visit(tree);
 
-		LinkedHashMap<String, String> outStack = visitor.visitorStack;
+		//LinkedHashMap<String, String> outStack = visitor.visitorStack;
 		
 		LinkedList<RHExpression> visitorRHExprList = visitor.visitorRHExprList;
 		
-		LinkedList<RHExpression> finalRHExprList = new LinkedList<>();
-		
-		/**
-		 * "text": "Root",
-	"root": true,
-	"isFirst": true,
-	"isLast": true,
-	id:'root'
-		 */
-		
-		
-		
-		RHExpression rootExpr = new RHExpression();
-		rootExpr.setFuncArgType("");
-		rootExpr.setType("");
-		
-		rootExpr.setTypeDet("");
-		rootExpr.setText("Root");
-		rootExpr.setRoot(true);
-		rootExpr.setFirst(true);
-		rootExpr.setLast(true);
-		rootExpr.setId("root");
-		
-		finalRHExprList.add(rootExpr);
-		
-		if(visitorRHExprList.size() == 1){
-			RHExpression assignExpr = new RHExpression();
-			assignExpr.setFuncArgType("FUN");
-			assignExpr.setType("Function");
-			
-			assignExpr.setTypeDet("ASSIGN");
-			assignExpr.setText("ASSIGN");
-			finalRHExprList.add(assignExpr);
-		}
-		
-		finalRHExprList.addAll(visitorRHExprList);
-		
-		
-		
-		
-		
+		FilesUtil.createFile("output/if_else_if.json", gson.toJson(visitorRHExprList));
 
-		Set<Entry<String, String>> outEntrySet = outStack.entrySet();
-		// System.out.println(tree);
-		for (Entry<String, String> entry : outEntrySet) {
-			log.debug(entry.getKey() + " #### " + entry.getValue());
-		}
-		
-		FilesUtil.createFile("output/if_else_if.json", gson.toJson(finalRHExprList));
-
-		return finalRHExprList;
+		return visitorRHExprList;
 
 	}
 
