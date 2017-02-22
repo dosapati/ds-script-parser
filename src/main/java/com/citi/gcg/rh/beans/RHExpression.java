@@ -182,6 +182,7 @@ public class RHExpression {
 	private String funcArgDataType;
 	private String type = "";
 	private String id = "";
+	private String parentId = "";
 	private boolean root =  false;
 	private boolean isFirst =  true;
 	private boolean isLast =  true;
@@ -218,6 +219,12 @@ public class RHExpression {
 	}
 	public void set_otherAttrMap(Map<String,String> _otherAttrMap) {
 		this._otherAttrMap = _otherAttrMap;
+	}
+	public String getParentId() {
+		return parentId;
+	}
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 	private RHEntityAttributeObject rec;
 	

@@ -45,9 +45,9 @@ public class App3 {
 
 			String s1 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' else UpCase(DateToString(Tfm_Standardize.CHRG_OFF_DT,'%dd%mmm%yyyy'))";
 			String s2 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' ";
-			String s3 = "Tfm_Standardize.REPORTING_PERIOD [1,6]";
+			String s = "Tfm_Standardize.REPORTING_PERIOD [1,6]";
 			String s4 = "Tfm_Standardize.ACCOUNT_NUMBER";
-			String s = "'0.0'";
+			String s6 = "'0.0'";
 			ANTLRInputStream input = new ANTLRInputStream(s);
 			DSDerivationGrammarLexer lexer = new DSDerivationGrammarLexer(input);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -113,11 +113,11 @@ public class App3 {
 			
 			
 
-			Set<Entry<String, String>> outEntrySet = outStack.entrySet();
+			/*Set<Entry<String, String>> outEntrySet = outStack.entrySet();
 			// System.out.println(tree);
 			for (Entry<String, String> entry : outEntrySet) {
 				System.out.println(entry.getKey() + " #### " + entry.getValue());
-			}
+			}*/
 			
 			FilesUtil.createFile("output/if_else_if.json", gson.toJson(finalRHExprList));
 

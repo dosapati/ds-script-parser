@@ -2,8 +2,7 @@ grammar DSDerivationGrammar;
     
     
 statement
-	: if_then_else  EOF?
-    | expression EOF
+	: expression EOF
     | substring EOF
     | literal
     | primaryExpr
@@ -15,7 +14,7 @@ statement
  
 if_then: IF expression THEN expression;   
 
-if_then_else: IF expression THEN expression (ELSE expression* statement*)?;  
+if_then_else: IF expression THEN expression (ELSE expression*)?;  
 
 //if_then_else: IF expressionList THEN expressionList (ELSE expressionList* statement*)?;   
  
@@ -50,23 +49,24 @@ localVariableDeclaration
     ;    
 
 arguments
-    :   expression (',' expression)*
+    :   expression (',' expressionList)* 
     ;
 expressionList
-    :   expression (',' expression)*  ;  
+    :   expression (',' expressionList)*  ;  
 //substring:  subStringVarName  '[' (literal (',' literal)* (',')? )? ']'; 
 
 subStringVarName : inputLinkName '.' columnName;
 
+function_call : funcname  '(' arguments ')';
+
  expression
-    :   expression '.' Identifier
-    |   expression '.' 'this'
-    |   funcname '(' arguments? ')'
-    |   expression '[' expression ']'
+    :   if_then_else
+    |   funcname  '(' arguments ')'
     |   expression '(' expressionList? ')'
     |   '(' primitiveType ')' expression
     |   expression binary_operator expression
     |   expression '?' expression ':' expression
+    |   Identifier
     |   literal
     |   primaryExpr
     |   <assoc=right> expression
