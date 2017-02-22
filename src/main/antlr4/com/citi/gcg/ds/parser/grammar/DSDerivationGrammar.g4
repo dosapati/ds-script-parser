@@ -2,11 +2,16 @@ grammar DSDerivationGrammar;
     
     
 statement
-    : if_then_else  EOF?
+	: if_then_else  EOF?
     | expression EOF
     | substring EOF
+    | literal
+    | primaryExpr
+    | Identifier
     | EOF
     ;
+    
+     
  
 if_then: IF expression THEN expression;   
 
@@ -14,7 +19,7 @@ if_then_else: IF expression THEN expression (ELSE expression* statement*)?;
 
 //if_then_else: IF expressionList THEN expressionList (ELSE expressionList* statement*)?;   
  
-substring_expression : expression '[' expression (',' expression)* ']';
+substring : expression '[' expression (',' expression)* ']';
     
  else_part:
     ELSE expression
@@ -49,7 +54,7 @@ arguments
     ;
 expressionList
     :   expression (',' expression)*  ;  
-substring:  subStringVarName  '[' (literal (',' literal)* (',')? )? ']'; 
+//substring:  subStringVarName  '[' (literal (',' literal)* (',')? )? ']'; 
 
 subStringVarName : inputLinkName '.' columnName;
 
@@ -104,8 +109,12 @@ primary
     |   Identifier
     |   'void' '.' 'class'
     ;  
+
+/* Will I use this, as of now all are in statement...  */    
+assignExpr: inputLinkName '.' columnName | literal ;
     
-assignExpr: inputLinkName '.' columnName;
+    
+assignExpr1: inputLinkName '.' columnName;
 
 primaryExpr: inputLinkName '.' columnName;
 

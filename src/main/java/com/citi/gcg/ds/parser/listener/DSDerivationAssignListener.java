@@ -61,7 +61,7 @@ public class DSDerivationAssignListener extends DSDerivationLiteralListener {
 
 		exprList.put(ctx.getRuleIndex(), localExprList);
 		
-		System.out.println(ctx.getRuleIndex()+"~~~"+ctx.inputLinkName().getText()+"  ~~~ "+ctx.columnName().getText());
+		//System.out.println(ctx.getRuleIndex()+"~~~"+ctx.inputLinkName().getText()+"  ~~~ "+ctx.columnName().getText());
 		
 	}
 

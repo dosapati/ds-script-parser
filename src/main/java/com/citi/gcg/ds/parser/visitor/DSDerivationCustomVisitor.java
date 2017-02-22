@@ -135,25 +135,24 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 	@Override
 	public Value visitSubstring(@NotNull DSDerivationGrammarParser.SubstringContext ctx) {
 
-		// Value inputLinkName = (Map)visit(ctx.subStringVarName());
-		// System.out.println("subs -- >
-		// "+ctx.getChild(0).getClass().getName());
-
-		visitorStack.put("start", visit(ctx.getChild(2)).asString());
-		visitorStack.put("length", visit(ctx.getChild(4)).asString());
-
-		// Value columnName = visit(ctx.());
-
-		// System.out.println("varName -->"+m11.get("inputLinkName")+" ...
-		// "+m11.get("columnName"));
-
-		/*
-		 * System.out.println("visitor ~~ " + ctx.getRuleIndex() + "~~ depth ->" +
-		 * ctx.depth() + ",  ->" + ctx.getText() + " ->" + ctx.getChild(0).getText()
-		 * + " child 3 -->" + ctx.getChild(2).getText() + " child 5 -->" +
-		 * ctx.getChild(4).getText());
+		/**
+		 * funcArgType": "FUN",
+		"expanded": true,
+		"text": "SUBSTRING",
+		"type": "Function",
+		"typeDet": "SUBSTRING",
 		 */
-		return new Value(ctx.getText());
+		RHExpression expr = new RHExpression();
+		expr.setFuncArgType("Fun");
+		expr.setType("Function");
+		expr.setTypeDet("SUBSTRING");
+		expr.setText("SUBSTRING");
+		visitorRHExprList.add(expr);
+		
+		StringBuilder sb = new StringBuilder();
+		visitChilds(ctx, sb);
+		Value v = new Value(sb.toString());
+		return v;
 	}
 
 	@Override
@@ -234,6 +233,14 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		return v;
 	}
 	
+	static Map<String,String> replaceStrs = new LinkedHashMap<>();
+	
+	static{
+		replaceStrs.put("%dd%mmm%yyyy", "DDMONYYYY");
+	}
+	
+	
+	
 	public String cleanUpString(String s){
 		if(StringUtils.startsWith(s, "'")){
 			s = StringUtils.removeFirst(s, "'");
@@ -242,7 +249,9 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 			s = StringUtils.removeFirst(s, "\"");
 			s = StringUtils.removeEnd(s, "\"");
 		}
-		
+		if(replaceStrs.containsKey(s)){
+			s = replaceStrs.get(s);
+		}
 		return s;
 		
 	}

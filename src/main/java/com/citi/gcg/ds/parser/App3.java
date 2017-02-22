@@ -4,6 +4,7 @@
 package com.citi.gcg.ds.parser;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -42,9 +43,11 @@ public class App3 {
 
 			System.out.println("ABC... !");
 
-			String s2 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' else UpCase(DateToString(Tfm_Standardize.CHRG_OFF_DT,'%dd%mmm%yyyy'))";
-			String s1 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' ";
-			String s = "Tfm_Standardize.REPORTING_PERIOD [1,6]";
+			String s1 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' else UpCase(DateToString(Tfm_Standardize.CHRG_OFF_DT,'%dd%mmm%yyyy'))";
+			String s2 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' ";
+			String s3 = "Tfm_Standardize.REPORTING_PERIOD [1,6]";
+			String s4 = "Tfm_Standardize.ACCOUNT_NUMBER";
+			String s = "'0.0'";
 			ANTLRInputStream input = new ANTLRInputStream(s);
 			DSDerivationGrammarLexer lexer = new DSDerivationGrammarLexer(input);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -65,6 +68,50 @@ public class App3 {
 			visitor.visit(tree);
 
 			LinkedHashMap<String, String> outStack = visitor.visitorStack;
+			
+			LinkedList<RHExpression> visitorRHExprList = visitor.visitorRHExprList;
+			
+			LinkedList<RHExpression> finalRHExprList = new LinkedList<>();
+			
+			/**
+			 * "text": "Root",
+		"root": true,
+		"isFirst": true,
+		"isLast": true,
+		id:'root'
+			 */
+			
+			
+			
+			RHExpression rootExpr = new RHExpression();
+			rootExpr.setFuncArgType("");
+			rootExpr.setType("");
+			
+			rootExpr.setTypeDet("");
+			rootExpr.setText("Root");
+			rootExpr.setRoot(true);
+			rootExpr.setFirst(true);
+			rootExpr.setLast(true);
+			rootExpr.setId("root");
+			
+			finalRHExprList.add(rootExpr);
+			
+			if(visitorRHExprList.size() == 1){
+				RHExpression assignExpr = new RHExpression();
+				assignExpr.setFuncArgType("FUN");
+				assignExpr.setType("Function");
+				
+				assignExpr.setTypeDet("ASSIGN");
+				assignExpr.setText("ASSIGN");
+				finalRHExprList.add(assignExpr);
+			}
+			
+			finalRHExprList.addAll(visitorRHExprList);
+			
+			
+			
+			
+			
 
 			Set<Entry<String, String>> outEntrySet = outStack.entrySet();
 			// System.out.println(tree);
@@ -72,7 +119,7 @@ public class App3 {
 				System.out.println(entry.getKey() + " #### " + entry.getValue());
 			}
 			
-			FilesUtil.createFile("output/if_else_if.json", gson.toJson(visitor.visitorRHExprList));
+			FilesUtil.createFile("output/if_else_if.json", gson.toJson(finalRHExprList));
 
 		} catch (Exception e) {
 			// TODO: handle exception

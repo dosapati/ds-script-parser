@@ -166,10 +166,22 @@ public class RHExpression {
 	}
 	private String text =  "";
 	private String typeDet = "";
-	private String funcArgType = "FUN";
+	private String funcArgType = "";
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
 	private String funcArgDataType;
 	private String type = "";
-	
+	private String id = "";
 	private boolean root =  false;
 	private boolean isFirst =  true;
 	private boolean isLast =  true;
