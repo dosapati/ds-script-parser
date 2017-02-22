@@ -55,8 +55,9 @@ public class DSDerivationGrammarUtil {
 
 	/**
 	 * @param args
+	 * @return 
 	 */
-	public static void parseDerivation(String derivationStmt) throws Exception {
+	public static LinkedList<RHExpression> parseDerivation(String derivationStmt) throws Exception {
 		ANTLRInputStream input = new ANTLRInputStream(derivationStmt);
 		DSDerivationGrammarLexer lexer = new DSDerivationGrammarLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -130,7 +131,7 @@ public class DSDerivationGrammarUtil {
 		
 		FilesUtil.createFile("output/if_else_if.json", gson.toJson(finalRHExprList));
 
-	
+		return finalRHExprList;
 
 	}
 
