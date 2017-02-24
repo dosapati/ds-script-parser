@@ -33,6 +33,8 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 
 	static Stack<String> idStack = new Stack<>();
 	
+	int depthNum = -1;
+	
 	
 	
 	String idPrefix = "ext-";
@@ -59,6 +61,7 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		if(ctx.getChild(0).getChild(0) instanceof LiteralContext || ctx.getChild(0).getChild(0) instanceof PrimaryExprContext){
 			String id = generateTreeId();
 			idStack.push(id);
+			depthNum++;
 			
 			RHExpression expr = new RHExpression();
 			expr.setFuncArgType("FUN");
@@ -66,10 +69,12 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 			
 			expr.setTypeDet("ASSIGN");
 			expr.setText("ASSIGN");
+			expr.setDepth(depthNum);
 			
 			//System.out.println("idStack --> "+idStack.size());
 			expr.setParentId(idStack.get(idStack.size()-2));
 			expr.setId(idStack.peek());
+			expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
 			visitorRHExprList.add(expr);
 		}
 		
@@ -85,15 +90,30 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		rootExpr.setType("");
 		
 		rootExpr.setTypeDet("");
-		rootExpr.setText("Root");
+		rootExpr.setText("Start");
 		rootExpr.setRoot(true);
 		rootExpr.setFirst(true);
 		rootExpr.setLast(true);
 		rootExpr.setId("root");
+		rootExpr.setDepth(0);
+		rootExpr.setIndex(0);
 		visitorRHExprList.add(rootExpr);
 		idStack.push("root");
+		depthNum++;
 	}
- 
+	
+	private int findNumOfParentIdOccurances(String parentId){
+		int cnt = -1;
+		if(!StringUtils.equalsIgnoreCase("root", parentId)){
+			for (RHExpression expr : visitorRHExprList) {
+				if(StringUtils.equalsIgnoreCase(expr.getParentId(), parentId)){
+					cnt++;
+				}
+			}
+		}		
+		return cnt;
+	}
+  
 	@Override
 	public Value visitIf_then_else(@NotNull DSDerivationGrammarParser.If_then_elseContext ctx) {
 		// ctx.expression()
@@ -105,7 +125,7 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 			if (!(ctx.getChild(i) instanceof TerminalNodeImpl)) {
 				//System.out.println(ctx.getChild(i).getClass().getName());
 
-				if (i == 1) {
+				if (i == 1) {					
 					RHExpression expr = new RHExpression();
 					expr.setFuncArgType("FUN");
 					expr.setType("Condition");
@@ -114,14 +134,14 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 					expr.setLeaf(false);
 					expr.setParentId(idStack.get(idStack.size()-2));
 					expr.setId(idStack.peek());
+					expr.setDepth(depthNum);					
+					expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
 					visitorRHExprList.add(expr);
 					sb.append("<if>").append(visit(ctx.getChild(i))).append("</if>");
 				} else if (i == 3) {
-
 					
 					sb.append("<then>").append(visit(ctx.getChild(i))).append("</then>");
 				} else if (i == 5) {
-
 
 					sb.append("<else>").append(visit(ctx.getChild(i))).append("</else>");
 				}
@@ -169,9 +189,13 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		int childCount = ctx.getChildCount();
 		StringBuilder sb = new StringBuilder();
 		sb.append("<expression>");
-		String parentId = idStack.peek();
+		
 		String id = generateTreeId();
 		idStack.push(id);
+		
+		depthNum++;
+		
+		//System.out.println("indexStack -->"+depthNum);
 		//System.out.println(String.format("expr  parentId - %s, id - %s", parentId,id));
 		if(childCount>=5){
 			if(StringUtils.equalsIgnoreCase(ctx.getChild(1).getText(), "[") && StringUtils.equalsIgnoreCase(ctx.getChild(5).getText(), "]")){
@@ -184,6 +208,8 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 				//System.out.println("idStack --> "+idStack.size());
 				expr.setParentId(idStack.get(idStack.size()-2));
 				expr.setId(idStack.peek());
+				expr.setDepth(depthNum);
+				expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
 				visitorRHExprList.add(expr);
 			}
 		}
@@ -206,6 +232,9 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 
 		}
 		idStack.pop();
+		
+		depthNum--;
+		
 		sb.append("</expression>");
 		//System.out.println("expression --->" + sb.toString());
 		return new Value(sb.toString());
@@ -306,22 +335,40 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 
 	@Override
 	public Value visitStringLiteral(@NotNull DSDerivationGrammarParser.StringLiteralContext ctx) {
-		/**
-		 * "text": "MMDDYYYY",
-				"typeDet": "String_Value",
-				"funcArgType": "VALUE",
-				"funcArgDataType": "S",
-		 */
+		
 		RHExpression expr = new RHExpression();
-		expr.setFuncArgType("S");
-		expr.setType("VALUE");
+		expr.setFuncArgDataType("S");
+		expr.setFuncArgType("VALUE");
+		expr.setType("Value");
 		expr.setTypeDet("String_Value");
 		expr.setText(cleanUpString(ctx.getText()));
 		expr.setParentId(idStack.get(idStack.size()-2));
 		expr.setId(idStack.peek());
+		expr.setDepth(depthNum);
+		expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
 		visitorRHExprList.add(expr);
 		
-		//System.out.println("visitLiteral" + " ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());
+		//System.out.println("visitStringLiteral" + " ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText()+" ~~~ "+expr.getDepth());
+		Value v = new Value("<stringLiteral>" + ctx.getText() + "</stringLiteral>");
+		return v;
+	}
+	
+	@Override
+	public Value visitCharacterLiteral(@NotNull DSDerivationGrammarParser.CharacterLiteralContext ctx) {
+		
+		RHExpression expr = new RHExpression();
+		expr.setFuncArgDataType("S");
+		expr.setFuncArgType("VALUE");
+		expr.setType("Value");
+		expr.setTypeDet("String_Value");
+		expr.setText(cleanUpString(ctx.getText()));
+		expr.setParentId(idStack.get(idStack.size()-2));
+		expr.setId(idStack.peek());
+		expr.setDepth(depthNum);
+		expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
+		visitorRHExprList.add(expr);
+		
+		//System.out.println("visitCharLiteral" + " ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText()+" ~~~ "+expr.getDepth());
 		Value v = new Value("<stringLiteral>" + ctx.getText() + "</stringLiteral>");
 		return v;
 	}
@@ -345,20 +392,28 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		if(replaceStrs.containsKey(s)){
 			s = replaceStrs.get(s);
 		}
+		//Is this the right logic , we still need to validate with RH team .. 
+		if(StringUtils.isBlank(s.trim())){
+			s = " ";
+		}
 		return s;
 		
 	}
 
 	@Override
 	public Value visitNumberLiteral(@NotNull DSDerivationGrammarParser.NumberLiteralContext ctx) {
-		//System.out.println("visitLiteral" + " ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());
+		//System.out.println("visitLiteral" + " ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());	
+		
 		RHExpression expr = new RHExpression();
-		expr.setFuncArgType("N");
-		expr.setType("VALUE");
+		expr.setFuncArgDataType("N");
+		expr.setFuncArgType("VALUE");
+		expr.setType("Value");
 		expr.setTypeDet("Numeric_Value");
 		expr.setText(ctx.getText());
 		expr.setParentId(idStack.get(idStack.size()-2));
 		expr.setId(idStack.peek());
+		expr.setDepth(depthNum);
+		expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
 		visitorRHExprList.add(expr);
 		Value v = new Value("<numberLiteral>" + ctx.getText() + "</numberLiteral>");
 		return v;
@@ -394,6 +449,8 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		expr.setLeaf(false);
 		expr.setParentId(idStack.get(idStack.size()-2));
 		expr.setId(idStack.peek());
+		expr.setDepth(depthNum);
+		expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
 		visitorRHExprList.add(expr);
 		Value v = new Value("<funcName>" + ctx.getText() + "</funcName>");
 		return v;
@@ -426,21 +483,6 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		//System.out.println("visitPrimaryExpr ~~ " + ctx.getRuleIndex() + "~~~~ " + ctx.getText());
 		StringBuilder sb = new StringBuilder();
 		sb.append("<primaryExpr>");
-		
-		/*RHExpression expr = new RHExpression();
-		expr.setFuncArgType("FUN");
-		expr.setType("Common");
-
-		expr.setTypeDet(funcMapping.get(ctx.getText()));
-		expr.setText(funcMapping.get(ctx.getText()));
-		expr.setLeaf(false);
-		visitorRHExprList.add(expr);*/
-		
-		/*"text": "CRD_ACCT_NBR",
-		"typeDet": "Attribute",
-		"funcArgType": "ATTRIBUTE",
-		"leaf": true,
-		"type": "Parameter",*/
 		int childCount = ctx.getChildCount();
 		RHExpression expr = new RHExpression();
 		expr.setFuncArgType("ATTRIBUTE");
@@ -448,6 +490,8 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		expr.setTypeDet("Attribute");
 		expr.setParentId(idStack.get(idStack.size()-2));
 		expr.setId(idStack.peek());
+		expr.setDepth(depthNum);
+		expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
 		for (int i = 0; i < childCount; i++) {
 			if (!(ctx.getChild(i) instanceof TerminalNodeImpl)) {
 				Value v = visit(ctx.getChild(i));
