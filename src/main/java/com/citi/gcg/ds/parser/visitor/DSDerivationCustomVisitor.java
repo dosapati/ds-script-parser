@@ -218,7 +218,7 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 			//System.out.println(" - expression -->["+i+" - "+ctx.getChild(i).getClass().getName()+"]"+ctx.getChild(i).getText());
 
 			if (!(ctx.getChild(i) instanceof TerminalNodeImpl)) {
-				//System.out.println(ctx.getChild(i).getClass().getName());
+				System.out.println(ctx.getChild(i).getClass().getName());
 				
 				sb.append(visit(ctx.getChild(i)).asString());
 				
@@ -239,6 +239,25 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 		//System.out.println("expression --->" + sb.toString());
 		return new Value(sb.toString());
 	}
+	
+	
+	@Override
+	public Value visitBinary_operator(@NotNull DSDerivationGrammarParser.Binary_operatorContext ctx) { 
+		StringBuilder sb = new StringBuilder();
+		visitChilds(ctx, sb);
+		Value v = new Value(sb.toString());
+		return v;		
+	}
+	
+	public Value visitConcatenation_operator(@NotNull DSDerivationGrammarParser.Concatenation_operatorContext ctx) { 
+		StringBuilder sb = new StringBuilder();
+		sb.append("<concatenation_operator>").append(ctx.getText()).append("</concatenation_operator>");
+		Value v = new Value(sb.toString());
+		return v;		
+	}
+	
+	
+
 
 	/**
 	 * {@inheritDoc}
