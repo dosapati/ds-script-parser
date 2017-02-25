@@ -41,14 +41,20 @@ public class App3 {
 
 		try {
 
+			  String SPACE = " ";
+
 			System.out.println("ABC... !");
 
-			String s = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' else UpCase(DateToString(Tfm_Standardize.CHRG_OFF_DT,'%dd%mmm%yyyy'))";
-			String s2 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' ";
+			String s1 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' else UpCase(DateToString(Tfm_Standardize.CHRG_OFF_DT,'%dd%mmm%yyyy'))";
+			String s2 = "If IsNotNull(Tfm_Standardize.CHRG_OFF_DT) Then '2' Else '' ";
 			String s3 = "Tfm_Standardize.REPORTING_PERIOD [1,6]";
-			String s4 = "Tfm_Standardize.ACCOUNT_NUMBER";
+			String s6 = "Tfm_Standardize.ACCOUNT_NUMBER";
 			String s5 = "'0.0'";
-			ANTLRInputStream input = new ANTLRInputStream(s);
+			String s = "If IsNull(Lnk_Nxg_Data.CCL_AMOUNT) then '' else If Index(DecimalToString(Lnk_Nxg_Data.CCL_AMOUNT,\"suppress_zero\"), '.',1)=0 THEN \n" + 
+					"DecimalToString(Lnk_Nxg_Data.CCL_AMOUNT,\"suppress_zero\") : '.0' ELSE DecimalToString(Lnk_Nxg_Data.CCL_AMOUNT,\"suppress_zero\")";
+			String expr = s.replaceAll("[\\t\\n\\r]",SPACE).trim().replaceAll("( )+",SPACE);
+			System.out.println("expr ---> "+expr);
+			ANTLRInputStream input = new ANTLRInputStream(expr);
 			DSDerivationGrammarLexer lexer = new DSDerivationGrammarLexer(input);
 			CommonTokenStream tokens = new CommonTokenStream(lexer);
 			DSDerivationGrammarParser parser = new DSDerivationGrammarParser(tokens);
