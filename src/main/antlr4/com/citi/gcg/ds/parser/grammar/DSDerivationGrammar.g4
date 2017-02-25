@@ -43,7 +43,7 @@ localVariableDeclaration
     ;    
 
 arguments
-    :   expression (',' expressionList)* 
+    :   expression (',' expression)*
     ;
 expressionList
     :   expression (',' expressionList)*  ;  

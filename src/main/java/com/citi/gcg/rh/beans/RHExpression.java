@@ -184,10 +184,10 @@ public class RHExpression {
 	private String id = "";
 	private String parentId = "";
 	private boolean root =  false;
-	private boolean isFirst =  true;
-	private boolean isLast =  true;
-	private int depth = 0;
+	private boolean isFirst =  false;
+	private boolean isLast =  false;	
 	private int index = 0;
+	private int depth = 0;
 	private List<RHExpression> children = new LinkedList<>();
 	private boolean visible = true;
 	private boolean leaf = false;
