@@ -1,1 +1,3 @@
-test
+If IsNull(Lnk_Nxg_Data.CCL_AMOUNT) then '' else If Index(DecimalToString(Lnk_Nxg_Data.CCL_AMOUNT,"suppress_zero"), '.',1)
+=0 THEN DecimalToString(Lnk_Nxg_Data.CCL_AMOUNT,"suppress_zero") : '.0' 
+ELSE DecimalToString(Lnk_Nxg_Data.CCL_AMOUNT,"suppress_zero")

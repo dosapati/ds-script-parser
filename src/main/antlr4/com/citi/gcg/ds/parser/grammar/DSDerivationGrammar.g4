@@ -59,6 +59,7 @@ expression
     :   if_then_else
     |   expression '[' expression (',' expression) ']'
     |   funcname  '(' arguments ')'
+    |   '(' primaryExpr ')'
     |   expression '(' expressionList? ')'
     |   '(' primitiveType ')' expression
     |   expression binary_operator expression
