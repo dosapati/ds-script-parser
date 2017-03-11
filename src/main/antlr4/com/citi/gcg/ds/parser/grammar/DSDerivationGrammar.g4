@@ -29,7 +29,7 @@ if_then_else: IF expression THEN expression (ELSE expression*)?;
    : funcname LPAREN expression RPAREN
    ;   
    
- funcname : Identifier | '=';  
+ funcname : Identifier ;  
   
     
    
