@@ -46,7 +46,8 @@ public class App3 {
 			System.out.println("ABC... !");
 
 			String s1 = "If IsNull(Tfm_Standardize.CHRG_OFF_DT) then '' else UpCase(DateToString(Tfm_Standardize.CHRG_OFF_DT,'%dd%mmm%yyyy'))";
-			String s = "If IsNotNull(Tfm_Standardize.CHRG_OFF_DT) Then '2' Else (A.CHRG_OFF_DT) ";
+			String s2 = "If IsNotNull(Tfm_Standardize.CHRG_OFF_DT) Then '2' Else (A.CHRG_OFF_DT) ";
+			String s = "If Tfm_Standardize.CHRG_OFF_DT=\"RCT\" Then '12' Else '' ";
 			String s3 = "Tfm_Standardize.REPORTING_PERIOD [1,6]";
 			String s6 = "Tfm_Standardize.ACCOUNT_NUMBER";
 			String s5 = "'0.0'";

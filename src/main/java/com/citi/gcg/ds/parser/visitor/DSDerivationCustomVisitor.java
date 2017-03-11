@@ -225,6 +225,22 @@ public class DSDerivationCustomVisitor extends DSDerivationGrammarBaseVisitor<Va
 				// visitorStack.put("expr_"+(exprCounter++),
 				// visit(ctx.getChild(i)).asString());
 			} else {
+				if(StringUtils.equalsIgnoreCase(ctx.getChild(i).getText(), "=")){
+					System.out.println("add equals function block..");
+					RHExpression expr = new RHExpression();
+					expr.setFuncArgType("FUN");
+					expr.setType("Common");
+
+					expr.setTypeDet("EQUALS");
+					expr.setText("EQUALS");
+					expr.setLeaf(false);
+					expr.setParentId(idStack.get(idStack.size()-2));
+					expr.setId(idStack.peek());
+					expr.setDepth(depthNum);
+					expr.setIndex(findNumOfParentIdOccurances(expr.getParentId())+1);
+					visitorRHExprList.add(visitorRHExprList.size()-1,expr);
+					//visitorRHExprList.add(expr);
+				}
 				//System.out.println(i+"~~"+ctx.getChild(i).getText());
 			}
 
